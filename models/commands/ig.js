@@ -1,5 +1,5 @@
 module.exports.config = {
-  'name': `${global.config.PREFIX}`,
+  'name': `.`,
   'version': "1.0.0",
   'hasPermssion': 0x0,
   'credits': "JOY",
