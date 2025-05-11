@@ -13,7 +13,7 @@ module.exports.config = {
 
 module.exports.handleEvent = function({ api, event, client, __GLOBAL }) {
   var { threadID, messageID } = event;
-const rahad = await axios.get(`https://joy-video-api-94tm.onrender.com/random`);
+const rahad = await axios.get(`https://album-apis-xyz.vercel.app/aryan/crush`);
 const url = rahad.data.url,
 const path = __dirname + `/cache/video${ex}`;
       fs.writeFileSync(path, Buffer.from((await axios.get(url, { responseType: "arraybuffer" })).data, "binary"));
