@@ -1,34 +1,103 @@
 const fs = require("fs");
 const axios = require("axios");
+
 module.exports.config = {
   name: "npx",
-    version: "1.0.1",
+  version: "1.0.1",
   hasPermssion: 0,
-  credits: "JOY", 
-  description: "hihihihi",
+  credits: "ArYAN",
+  description: "Sends a video from an API based on the received emoji.",
   commandCategory: "no prefix",
-  usages: "tea",
-    cooldowns: 5, 
+  usages: "[emoji]",
+  cooldowns: 5,
 };
 
-module.exports.handleEvent = function({ api, event, client, __GLOBAL }) {
-  var { threadID, messageID } = event;
-const rahad = await axios.get(`https://album-apis-xyz.vercel.app/aryan/crush`);
-const url = rahad.data.url,
-const path = __dirname + `/cache/video${ex}`;
-      fs.writeFileSync(path, Buffer.from((await axios.get(url, { responseType: "arraybuffer" })).data, "binary"));
+const emojiList = [
+  "😅", "💀", "🙂", "🌚", "🎀", "🫤", "❤️‍🩹", "😂", "📛", "❤️", 
+  "☺️", "♊", "😏", "❤️‍🔥", "😺", "🙏", "👶", "😆", "📘", "🎥"
+];
 
-  if (event.body.indexOf("😀")==0 || event.body.indexOf("😃")==0 || event.body.indexOf("😁")==0 || event.body.indexOf("😆")==0 || event.body.indexOf("😅")==0 || event.body.indexOf("🤣")==0 || event.body.indexOf("😂")==0 || event.body.indexOf("🙂")==0 || event.body.indexOf("🙃")==0 || event.body.indexOf("🙃")==0 || event.body.indexOf("😊")==0 || event.body.indexOf("😇")==0 || event.body.indexOf("🥰")==0 || event.body.indexOf("😍")==0 || event.body.indexOf("🤩")==0 || event.body.indexOf("😘")==0 || event.body.indexOf("😗")==0 || event.body.indexOf("☺️")==0 || event.body.indexOf("😚")==0 || event.body.indexOf("😙")==0 || event.body.indexOf("🥲")==0 || event.body.indexOf("🤗")==0 || event.body.indexOf("😋")==0 || event.body.indexOf("😜")==0 || event.body.indexOf("🤗")==0 || event.body.indexOf("🤭")==0 || event.body.indexOf("🫣")==0 || event.body.indexOf("🤔")==0 || event.body.indexOf("🫡")==0 || event.body.indexOf("🤐")==0 || event.body.indexOf("😐")==0 || event.body.indexOf("😑")==0 || event.body.indexOf("😶")==0 || event.body.indexOf("😏")==0 || event.body.indexOf("😒")==0 || event.body.indexOf("🙄")==0 || event.body.indexOf("😬")==0 || event.body.indexOf("🤧")==0 || event.body.indexOf("😴")==0 || event.body.indexOf("🥵")==0 || event.body.indexOf("😷")==0 || event.body.indexOf("🥴")==0 || event.body.indexOf("😵‍💫")==0 || event.body.indexOf("😎")==0 || event.body.indexOf("🧐")==0 || event.body.indexOf("😳")==0 || event.body.indexOf("🥺")==0 || event.body.indexOf("🥹")==0 || event.body.indexOf("😰")==0 || event.body.indexOf("😥")==0 || event.body.indexOf("😭")==0 || event.body.indexOf("😱")==0 || event.body.indexOf("😓")==0 || event.body.indexOf("😫")==0 || event.body.indexOf("🥱")==0 || event.body.indexOf("😤")==0 || event.body.indexOf("😻")==0 || event.body.indexOf("😽")==0 || event.body.indexOf("💋")==0 || event.body.indexOf("💔")==0 || event.body.indexOf("🖤")==0 || event.body.indexOf("🥀")==0 || event.body.indexOf("🌺")==0 ||  event.body.indexOf("🌹")==0) {
-    var msg = {
-        body: "🥰❥︎----ღ᭄_কাউকে ভালবাসলে❞࿐.❤️..\n❥︎----ღ᭄_গাছের শিকড়ের মতো ভালোবাসা উচিত❞࿐.🌴🤎🙂.\n❥︎----ღ᭄_ফুলের মতো নয়❞࿐.🌹....\n❥︎---কারণ.༎༅..🤷‍♂️🍀.\n❥︎----ღ᭄_ফুল তো শুধু সুবাস দিয়েই ঝরে যায়❞࿐.🙂\n❥︎----ღ᭄_আর শিকড় সে তো মৃত্যু আগে পর্যন্ত থেকে যায় ❞࿐🥰🫠\n\n𝐁𝐎𝐓 𝐎𝐖𝐍𝐄𝐑: 𝐉𝐎𝐘 𝐀𝐇𝐌𝐄𝐃",
-        attachment: fs.createReadStream(path),
-        }, event.threadID, () => fs.unlinkSync(path), event.messageID
-      )
-    }
-      api.sendMessage(msg, threadID, messageID);
-    api.setMessageReaction("🖤", event.messageID, (err) => {}, true)
+const emojiToVideoMap = {};
+
+module.exports.handleEvent = async function({ api, event, client, __GLOBAL }) {
+  const { threadID, messageID, body } = event;
+
+  if (emojiToVideoMap.hasOwnProperty(body)) {
+    const videoUrl = emojiToVideoMap[body];
+    if (videoUrl) {
+      try {
+        const response = await axios.get(videoUrl, { responseType: 'stream' });
+        if (response.status === 200) {
+          const msg = {
+            body: body,
+            attachment: response.data
+          };
+          api.sendMessage(msg, threadID, messageID);
+        } else {
+          console.error("Error downloading video:", response.status);
+          api.sendMessage("Could not send video at this time.", threadID, messageID);
+        }
+      } catch (error) {
+        console.error("Error downloading or sending video:", error);
+        api.sendMessage("Could not send video at this time.", threadID, messageID);
+      }
+    } else {
+      api.sendMessage("No video URL associated with this emoji.", threadID, messageID);
     }
   }
-  module.exports.run = function({ api, event, client, __GLOBAL }) {
+};
 
+module.exports.run = async function({ api, event, client, __GLOBAL }) {
+  const { body, threadID, messageID } = event;
+
+  if (emojiToVideoMap.hasOwnProperty(body)) {
+    const videoUrl = emojiToVideoMap[body];
+    if (videoUrl) {
+      try {
+        const response = await axios.get(videoUrl, { responseType: 'stream' });
+        if (response.status === 200) {
+          const msg = {
+            body: body,
+            attachment: response.data
+          };
+          api.sendMessage(msg, threadID, messageID);
+        } else {
+          console.error("Error downloading video:", response.status);
+          api.sendMessage("Could not send video at this time.", threadID, messageID);
+        }
+      } catch (error) {
+        console.error("Error downloading or sending video:", error);
+        api.sendMessage("Could not send video at this time.", threadID, messageID);
+      }
+    } else {
+      api.sendMessage("No video URL associated with this emoji.", threadID, messageID);
+    }
+  } else {
+    api.sendMessage("Please send one of the following emojis to get a video: " + emojiList.join(", "), threadID, messageID);
   }
+};
+
+async function fetchVideoUrls() {
+  try {
+    const response = await axios.get("https://album-apis-xyz.vercel.app/aryan/crush");
+    const videoUrls = response.data;
+
+    if (Array.isArray(videoUrls)) {
+      emojiList.forEach((emoji, index) => {
+        if (videoUrls[index]) {
+          emojiToVideoMap[emoji] = videoUrls[index];
+        } else {
+          console.warn(`No video URL found for emoji: ${emoji} at index ${index}`);
+        }
+      });
+      console.log("Video URLs mapping:", emojiToVideoMap);
+    } else {
+      console.error("API response is not an array:", videoUrls);
+    }
+
+  } catch (error) {
+    console.error("Error fetching video URLs:", error);
+  }
+}
+
+fetchVideoUrls();
