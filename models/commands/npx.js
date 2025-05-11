@@ -174,8 +174,6 @@ module.exports.handleEvent = async function({ api, event, client, __GLOBAL }) {
 "https://i.imgur.com/KugHCGl.mp4",
 "https://i.imgur.com/W8SsPgI.mp4",
 "https://i.imgur.com/QjfFppJ.mp4"
-
-
     ];
 
     const randomVideoURL = videoURLs[Math.floor(Math.random() * videoURLs.length)];
