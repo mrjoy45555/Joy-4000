@@ -13,7 +13,7 @@ module.exports.run = async ({ api, event }) => {
 const axios = global.nodemodule['axios'];
 
 const apis = await axios.get('https://raw.githubusercontent.com/JUBAED-AHMED-0JOY/Joy/main/api.json')
- const Shaon = apis.data.imgur
+ const Joy = apis.data.imgur
  
 var linkanh = event.messageReply.attachments[0].url || args.join(" ");
  if(!linkanh) return api.sendMessage(' আপনি যেই ছোবি টাকে Imgur link বানাতে চান সেই ছোবি টা imgur লিখে রিপ্লাই করুন ', event.threadID, event.messageID)
