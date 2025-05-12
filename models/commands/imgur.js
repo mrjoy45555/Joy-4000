@@ -2,7 +2,7 @@ module.exports.config = {
  name: "imgur",
  version: "1.0.0", 
  hasPermssion: 0,
- credits: "Islamick Cyber Chat",
+ credits: "JOY",
  description: "create your video link",
  commandCategory: "other", 
  usages: "[tag]", 
