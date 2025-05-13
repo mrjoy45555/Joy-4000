@@ -17,7 +17,7 @@ const apis = await axios.get('https://raw.githubusercontent.com/JUBAED-AHMED-0JO
  
 var linkanh = event.messageReply.attachments[0].url || args.join(" ");
  if(!linkanh) return api.sendMessage(' আপনি যেই ছোবি টাকে Imgur link বানাতে চান সেই ছোবি টা imgur লিখে রিপ্লাই করুন ', event.threadID, event.messageID)
-const res = await axios.get(`${Joy}/imgur?link=${encodeURIComponent(linkanh)}`); 
+const res = await axios.get(`${Joy}/imgur?url=${encodeURIComponent(url)}`); 
 var img = res.data.uploaded.image;
  return api.sendMessage(`${img}`, event.threadID, event.messageID);
 }
